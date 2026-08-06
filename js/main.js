@@ -1,8 +1,7 @@
 (function () {
   "use strict";
 
-  /** Troque quando o Instagram estiver criado */
-  var INSTAGRAM_URL = "";
+  var INSTAGRAM_URL = "https://www.instagram.com/marcosdonizetifaria.advocacia";
 
   var WA_BASE = "https://wa.me/5513997497278";
   var MAPS_URL =
