@@ -37,6 +37,7 @@
         <nav class="nav-panel" id="menu-principal" aria-label="Menu principal">
           <ul class="nav-links">
             <li><a href="#inicio">Início</a></li>
+            <li><a href="/noticias">Notícias</a></li>
             <li><a href="#areas">Áreas de Atuação</a></li>
             <li><a href="#sobre">Sobre</a></li>
             <li><a href="#contato">Contato</a></li>
@@ -95,29 +96,53 @@
 
           <aside class="hero-news" aria-labelledby="hero-news-title">
             <div class="hero-news-head">
-              <span class="hero-news-live" aria-hidden="true"></span>
-              <div>
-                <p class="hero-news-kicker" id="hero-news-title">Atualizações oficiais</p>
-                <p class="hero-news-sources">INSS · STJ</p>
-              </div>
+              <p class="hero-news-kicker" id="hero-news-title">Últimas notícias</p>
             </div>
-            <ul class="hero-news-list" id="hero-news-list" aria-live="polite">
-              <li class="hero-news-status">Carregando atualizações…</li>
+            <ul
+              class="hero-news-list"
+              id="hero-news-list"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <li class="hero-news-skel" aria-hidden="true">
+                <span class="skel skel-thumb"></span>
+                <span class="skel-copy">
+                  <span class="skel skel-line skel-line--sm"></span>
+                  <span class="skel skel-line"></span>
+                </span>
+              </li>
+              <li class="hero-news-skel" aria-hidden="true">
+                <span class="skel skel-thumb"></span>
+                <span class="skel-copy">
+                  <span class="skel skel-line skel-line--sm"></span>
+                  <span class="skel skel-line skel-line--short"></span>
+                </span>
+              </li>
+              <li class="hero-news-skel" aria-hidden="true">
+                <span class="skel skel-thumb"></span>
+                <span class="skel-copy">
+                  <span class="skel skel-line skel-line--sm"></span>
+                  <span class="skel skel-line skel-line--mid"></span>
+                </span>
+              </li>
+              <li class="hero-news-skel" aria-hidden="true">
+                <span class="skel skel-thumb"></span>
+                <span class="skel-copy">
+                  <span class="skel skel-line skel-line--sm"></span>
+                  <span class="skel skel-line"></span>
+                </span>
+              </li>
+              <li class="hero-news-skel" aria-hidden="true">
+                <span class="skel skel-thumb"></span>
+                <span class="skel-copy">
+                  <span class="skel skel-line skel-line--sm"></span>
+                  <span class="skel skel-line skel-line--short"></span>
+                </span>
+              </li>
+              <li class="visually-hidden">Carregando últimas notícias…</li>
             </ul>
             <div class="hero-news-foot">
-              <a
-                href="https://www.gov.br/inss/pt-br/assuntos/noticias"
-                target="_blank"
-                rel="noopener noreferrer"
-                >INSS</a
-              >
-              <span aria-hidden="true">·</span>
-              <a
-                href="https://ww2.stj.jus.br/jurisprudencia/externo/informativo/"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Informativos STJ</a
-              >
+              <a class="btn btn-ghost btn-news" href="/noticias">Ver outras notícias</a>
             </div>
           </aside>
         </div>
@@ -256,11 +281,16 @@
         </div>
       </section>
 
-      <section class="section" id="duvidas" aria-labelledby="faq-titulo">
+      <section class="section section-faq" id="duvidas" aria-labelledby="faq-titulo">
         <div class="container">
-          <div class="section-head reveal">
+          <div class="section-head section-head--faq reveal">
             <span class="section-label">Dúvidas frequentes</span>
-            <h2 class="section-title" id="faq-titulo">Perguntas comuns</h2>
+            <h2 class="section-title" id="faq-titulo">
+              O que costuma surgir antes da primeira conversa.
+            </h2>
+            <p class="section-intro">
+              Respostas objetivas para orientar o início do atendimento previdenciário e trabalhista.
+            </p>
           </div>
           <div class="faq-list reveal">
             <div class="faq-item">
@@ -270,12 +300,14 @@
                 aria-expanded="false"
                 aria-controls="faq-1"
               >
-                <span>Preciso de advogado para pedir aposentadoria ou revisar benefício?</span>
-                <span aria-hidden="true">+</span>
+                <span>Preciso de advogado para pedir aposentadoria ou revisar um benefício?</span>
+                <span class="faq-toggle" aria-hidden="true"></span>
               </button>
               <div class="faq-answer" id="faq-1" hidden>
-                Sim. A orientação especializada contribui para uma análise mais segura da
-                documentação, do tempo de contribuição e das regras aplicáveis ao seu caso.
+                <p>
+                  Sim. A orientação especializada contribui para uma análise mais segura da
+                  documentação, do tempo de contribuição e das regras aplicáveis ao seu caso.
+                </p>
               </div>
             </div>
             <div class="faq-item">
@@ -285,12 +317,15 @@
                 aria-expanded="false"
                 aria-controls="faq-2"
               >
-                <span>Vocês também atuam em Direito Trabalhista?</span>
-                <span aria-hidden="true">+</span>
+                <span>Quais documentos são necessários para a análise inicial?</span>
+                <span class="faq-toggle" aria-hidden="true"></span>
               </button>
               <div class="faq-answer" id="faq-2" hidden>
-                Sim. Nossa principal especialização é o Direito Previdenciário, e também oferecemos
-                orientação e representação em demandas trabalhistas.
+                <p>
+                  Em geral, documentos pessoais, histórico profissional e comprovantes de
+                  contribuição — como CNIS, carteiras de trabalho e guias de recolhimento. Na
+                  conversa inicial, indicamos o que é essencial para o seu caso.
+                </p>
               </div>
             </div>
             <div class="faq-item">
@@ -300,12 +335,31 @@
                 aria-expanded="false"
                 aria-controls="faq-3"
               >
-                <span>O atendimento pode ser realizado online?</span>
-                <span aria-hidden="true">+</span>
+                <span>Vocês também atuam em Direito Trabalhista?</span>
+                <span class="faq-toggle" aria-hidden="true"></span>
               </button>
               <div class="faq-answer" id="faq-3" hidden>
-                Sim. Atendemos de forma presencial ou online em Santos/SP, conforme a necessidade de
-                cada cliente.
+                <p>
+                  Sim. Nossa principal especialização é o Direito Previdenciário, e também
+                  oferecemos orientação e representação em demandas trabalhistas.
+                </p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button
+                class="faq-question"
+                type="button"
+                aria-expanded="false"
+                aria-controls="faq-4"
+              >
+                <span>O atendimento pode ser realizado online?</span>
+                <span class="faq-toggle" aria-hidden="true"></span>
+              </button>
+              <div class="faq-answer" id="faq-4" hidden>
+                <p>
+                  Sim. Atendemos de forma presencial ou online em Santos/SP, conforme a necessidade
+                  de cada cliente.
+                </p>
               </div>
             </div>
           </div>
@@ -347,6 +401,7 @@
             <h3>Atendimento</h3>
             <p>Santos/SP</p>
             <p>Presencial e online</p>
+            <a href="/noticias">Notícias oficiais</a>
           </div>
           <div class="footer-col">
             <h3>Contato</h3>

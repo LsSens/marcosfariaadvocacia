@@ -5,6 +5,7 @@ Site estático — Direito Previdenciário e Trabalhista (Santos/SP).
 ## Páginas
 
 - `/` — landing principal
+- `/noticias` — boletim com publicações oficiais do INSS e Informativos do STJ
 - `/links` — hub para bio do Instagram (WhatsApp, Maps, Instagram, site)
 
 ## Logo

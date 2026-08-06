@@ -4,6 +4,8 @@ const UA =
 const INSS_URL = "https://www.gov.br/inss/pt-br/assuntos/noticias";
 const STJ_FEED =
   "https://processo.stj.jus.br/jurisprudencia/externo/InformativoFeed";
+const STJ_HOME =
+  "https://ww2.stj.jus.br/jurisprudencia/externo/informativo/";
 
 function decodeEntities(str) {
   return String(str || "")
@@ -51,7 +53,16 @@ function parseInss(html) {
     );
     if (!titleMatch) continue;
 
+    const summaryMatch = article.match(
+      /<span class="description">([\s\S]*?)<\/span>/i
+    );
+    const categoryMatch = article.match(
+      /<span class="subtitle">([\s\S]*?)<\/span>/i
+    );
+    const imageMatch = article.match(/<img[^>]+src="([^"]+)"[^>]*>/i);
+    const altMatch = article.match(/<img[^>]+alt="([^"]*)"/i);
     const dateMatch = article.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+
     let date = null;
     let dateLabel = "";
     if (dateMatch) {
@@ -63,10 +74,36 @@ function parseInss(html) {
       dateLabel = dateMatch[0];
     }
 
+    const summary = summaryMatch
+      ? stripTags(summaryMatch[1])
+      : "Notícia oficial publicada pelo Instituto Nacional do Seguro Social.";
+
+    const title = stripTags(titleMatch[2]);
+    const listingImage = imageMatch ? decodeEntities(imageMatch[1]) : null;
+    let image = listingImage;
+    let imageLarge = listingImage;
+    let imageThumb = listingImage;
+
+    // Plone: /@@images/image/large ≈ 768px; listing thumb costuma ser 128px
+    if (listingImage && listingImage.indexOf("/@@images/") !== -1) {
+      const objectUrl = listingImage.split("/@@images/")[0];
+      imageThumb = objectUrl + "/@@images/image/preview";
+      imageLarge = objectUrl + "/@@images/image/large";
+      image = imageLarge;
+    }
+
     items.push({
       source: "INSS",
       sourceLabel: "INSS",
-      title: stripTags(titleMatch[2]),
+      sourceName: "Instituto Nacional do Seguro Social (INSS)",
+      category: categoryMatch ? stripTags(categoryMatch[1]) : "Notícia",
+      title: title,
+      summary: summary,
+      image: image,
+      imageThumb: imageThumb,
+      imageLarge: imageLarge,
+      imageFallback: listingImage,
+      imageAlt: altMatch ? stripTags(altMatch[1]) || title : title,
       url: titleMatch[1],
       date: date ? date.toISOString() : null,
       dateLabel: dateLabel || "",
@@ -80,7 +117,7 @@ function parseStjFeed(xml) {
   const entries = xml.match(/<entry>([\s\S]*?)<\/entry>/gi) || [];
   const items = [];
 
-  for (const entry of entries.slice(0, 8)) {
+  for (const entry of entries.slice(0, 12)) {
     const titleMatch = entry.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
     const linkMatch =
       entry.match(/<link[^>]*href="([^"]+)"/i) ||
@@ -88,9 +125,11 @@ function parseStjFeed(xml) {
     const dateMatch =
       entry.match(/<updated>([^<]+)<\/updated>/i) ||
       entry.match(/<published>([^<]+)<\/published>/i);
+    const summaryMatch = entry.match(/<summary[^>]*>([\s\S]*?)<\/summary>/i);
 
     if (!titleMatch || !linkMatch) continue;
 
+    const title = stripTags(titleMatch[1]).replace(/\.$/, "");
     const rawDate = dateMatch ? dateMatch[1] : null;
     const date = rawDate ? new Date(rawDate) : null;
     const dateLabel =
@@ -98,10 +137,24 @@ function parseStjFeed(xml) {
         ? date.toLocaleDateString("pt-BR")
         : "";
 
+    let summary = summaryMatch ? stripTags(summaryMatch[1]) : "";
+    if (!summary) {
+      summary =
+        "Edição do Informativo de Jurisprudência do Superior Tribunal de Justiça, com os principais entendimentos publicados nesta data. Consulte a íntegra na fonte oficial.";
+    }
+
     items.push({
       source: "STJ",
       sourceLabel: "STJ",
-      title: stripTags(titleMatch[1]).replace(/\.$/, ""),
+      sourceName: "Superior Tribunal de Justiça (STJ)",
+      category: "Informativo",
+      title: title,
+      summary: summary,
+      image: null,
+      imageThumb: null,
+      imageLarge: null,
+      imageFallback: null,
+      imageAlt: title,
       url: decodeEntities(linkMatch[1]),
       date: date && !Number.isNaN(date.getTime()) ? date.toISOString() : null,
       dateLabel: dateLabel,
@@ -117,10 +170,16 @@ function byDateDesc(a, b) {
   return db - da;
 }
 
-function mergeNews(inssItems, stjItems) {
-  const pickInss = inssItems.slice().sort(byDateDesc).slice(0, 4);
+function mergeNews(inssItems, stjItems, full) {
+  if (full) {
+    const pickInss = inssItems.slice().sort(byDateDesc).slice(0, 10);
+    const pickStj = stjItems.slice(0, 6);
+    return pickInss.concat(pickStj).sort(byDateDesc);
+  }
+
+  const pickInss = inssItems.slice().sort(byDateDesc).slice(0, 8);
   const pickStj = stjItems.slice(0, 2);
-  return pickInss.concat(pickStj).sort(byDateDesc).slice(0, 6);
+  return pickInss.concat(pickStj).sort(byDateDesc);
 }
 
 module.exports = async function handler(req, res) {
@@ -135,6 +194,12 @@ module.exports = async function handler(req, res) {
     res.status(204).end();
     return;
   }
+
+  const full =
+    req.query &&
+    (req.query.full === "1" ||
+      req.query.full === "true" ||
+      req.query.full === "yes");
 
   try {
     const results = await Promise.allSettled([
@@ -151,14 +216,15 @@ module.exports = async function handler(req, res) {
       throw new Error("Nenhuma fonte respondeu");
     }
 
-    const items = mergeNews(inssItems, stjItems);
+    const items = mergeNews(inssItems, stjItems, full);
 
     res.status(200).json({
       updatedAt: new Date().toISOString(),
+      full: Boolean(full),
       items: items,
       sources: {
         inss: INSS_URL,
-        stj: "https://ww2.stj.jus.br/jurisprudencia/externo/informativo/",
+        stj: STJ_HOME,
       },
       errors: [
         results[0].status === "rejected" ? String(results[0].reason) : null,
