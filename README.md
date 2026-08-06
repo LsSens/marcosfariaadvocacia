@@ -16,10 +16,17 @@ Site estático — Direito Previdenciário e Trabalhista (Santos/SP).
 
 ## Desenvolvimento local
 
-Abra `index.html` no navegador ou sirva a pasta:
+Para o site estático:
 
 ```bash
 npx serve .
+```
+
+O painel de notícias (INSS + Informativos STJ) usa a rota `/api/noticias`.
+Para testar com a API localmente:
+
+```bash
+npx vercel dev
 ```
 
 ## Deploy na Vercel

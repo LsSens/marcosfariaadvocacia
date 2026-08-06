@@ -2,6 +2,5 @@
 .DS_Store
 Thumbs.db
 *.log
-
-.vercel
+.cache-probe
 .env*

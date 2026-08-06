@@ -132,11 +132,87 @@
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
+  function escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderNewsFallback(list, message) {
+    list.innerHTML =
+      '<li class="hero-news-status is-error">' +
+      escapeHtml(message) +
+      "</li>" +
+      '<li class="hero-news-item">' +
+      '<a href="https://www.gov.br/inss/pt-br/assuntos/noticias" target="_blank" rel="noopener noreferrer">' +
+      '<p class="hero-news-meta"><span class="hero-news-badge">INSS</span></p>' +
+      '<p class="hero-news-title">Acompanhe as notícias oficiais do INSS</p>' +
+      "</a></li>" +
+      '<li class="hero-news-item">' +
+      '<a href="https://ww2.stj.jus.br/jurisprudencia/externo/informativo/" target="_blank" rel="noopener noreferrer">' +
+      '<p class="hero-news-meta"><span class="hero-news-badge">STJ</span></p>' +
+      '<p class="hero-news-title">Consulte os Informativos de Jurisprudência do STJ</p>' +
+      "</a></li>";
+  }
+
+  function initNews() {
+    var list = document.getElementById("hero-news-list");
+    if (!list) return;
+
+    fetch("/api/noticias")
+      .then(function (res) {
+        if (!res.ok) throw new Error("Resposta " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var items = (data && data.items) || [];
+        if (!items.length) {
+          renderNewsFallback(
+            list,
+            "Não foi possível carregar as atualizações agora."
+          );
+          return;
+        }
+
+        list.innerHTML = items
+          .map(function (item) {
+            return (
+              '<li class="hero-news-item">' +
+              '<a href="' +
+              escapeHtml(item.url) +
+              '" target="_blank" rel="noopener noreferrer">' +
+              '<p class="hero-news-meta">' +
+              '<span class="hero-news-badge">' +
+              escapeHtml(item.sourceLabel || item.source) +
+              "</span>" +
+              (item.dateLabel
+                ? "<span>" + escapeHtml(item.dateLabel) + "</span>"
+                : "") +
+              "</p>" +
+              '<p class="hero-news-title">' +
+              escapeHtml(item.title) +
+              "</p>" +
+              "</a></li>"
+            );
+          })
+          .join("");
+      })
+      .catch(function () {
+        renderNewsFallback(
+          list,
+          "Atualizações indisponíveis no momento. Acesse as fontes oficiais:"
+        );
+      });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyConfig();
     initNav();
     initFaq();
     initReveal();
     initHeaderScroll();
+    initNews();
   });
 })();
