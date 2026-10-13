@@ -3,19 +3,37 @@
 
   var INSTAGRAM_URL = "https://www.instagram.com/marcosdonizetifaria.advocacia";
 
-  var WA_BASE = "https://wa.me/5513997497278";
+  var WA_BASE_DEFAULT = "https://wa.me/5513997497278";
   var MAPS_URL =
     "https://www.google.com/maps/search/?api=1&query=Santos+SP";
 
-  function waUrl(message) {
+  function digitsOnly(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function waBaseFromNumber(number) {
+    var digits = digitsOnly(number);
+    return digits ? "https://wa.me/" + digits : WA_BASE_DEFAULT;
+  }
+
+  function pageWaBase() {
+    var pageNumber = document.body
+      ? document.body.getAttribute("data-wa-number")
+      : "";
+    return pageNumber ? waBaseFromNumber(pageNumber) : WA_BASE_DEFAULT;
+  }
+
+  function waUrl(message, number) {
     var text = message || "Olá, gostaria de agendar uma consulta.";
-    return WA_BASE + "?text=" + encodeURIComponent(text);
+    var base = number ? waBaseFromNumber(number) : pageWaBase();
+    return base + "?text=" + encodeURIComponent(text);
   }
 
   function applyConfig() {
     document.querySelectorAll("[data-wa]").forEach(function (el) {
       var msg = el.getAttribute("data-wa-msg") || "";
-      el.setAttribute("href", waUrl(msg));
+      var number = el.getAttribute("data-wa-number") || "";
+      el.setAttribute("href", waUrl(msg, number));
       el.setAttribute("target", "_blank");
       el.setAttribute("rel", "noopener noreferrer");
     });

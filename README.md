@@ -6,7 +6,8 @@ Site estático — Direito Previdenciário e Trabalhista (Santos/SP).
 
 - `/` — landing principal
 - `/noticias` — boletim com publicações oficiais do INSS e Informativos do STJ
-- `/links` — hub para bio do Instagram (WhatsApp, Maps, Instagram, site)
+- `/links` — hub para bio do Instagram (WhatsApp principal: 13 99749-7278)
+- `/links-g` — mesmo hub, com WhatsApp alternativo: 13 99626-7456
 
 ## Logo
 
